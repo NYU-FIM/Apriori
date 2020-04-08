@@ -67,8 +67,6 @@ def apriori(sc, f_input, f_output, min_sup):
 
 
 if __name__ == "__main__":
-    if os.path.exists(sys.argv[2]):
-        shutil.rmtree(sys.argv[2])
     apriori(SparkContext(appName="Spark Apriori"), "../data/test.dat", "../result/test", 0.5)
     # apriori(SparkContext(appName="Spark Apriori"), "../data/chess.dat", "../result/chess", 0.8)
     # apriori(SparkContext(appName="Spark Apriori"), "../data/mushroom.dat", "../result/mushroom", 0.8)
