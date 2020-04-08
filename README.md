@@ -13,6 +13,9 @@ spark-submit ./src/apriori.py
 
 ### Credit
 https://github.com/zhang943/Spark-Apriori
+
 https://github.com/tracy-talent/curriculum/blob/master/MapReduce/Apriori/src/distributed/Apiori1.scala
+
 https://github.com/apache/spark/pull/2847
+
 https://github.com/Cheng-Lin-Li/Spark
