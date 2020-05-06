@@ -1,11 +1,12 @@
+from pyspark import SparkContext
+from pyspark.sql import SparkSession
+from pyspark.sql.types import *
 import os
 import shutil
 import sys
-
-from pyspark import SparkContext
+import time
 
 DEBUG = 1
-
 
 def Dprint(info):
     if DEBUG:
@@ -63,11 +64,34 @@ def apriori(sc, f_input, f_output, min_sup):
 
     # output the result to file system
     sc.parallelize(frequent_itemset, numSlices=1).saveAsTextFile(f_output)
-    sc.stop()
 
 
 if __name__ == "__main__":
-    apriori(SparkContext(appName="Spark Apriori"), "../data/test.dat", "../result/test", 0.5)
-    # apriori(SparkContext(appName="Spark Apriori"), "../data/chess.dat", "../result/chess", 0.8)
-    # apriori(SparkContext(appName="Spark Apriori"), "../data/mushroom.dat", "../result/mushroom", 0.8)
-    # apriori(SparkContext(appName="Spark Apriori"), "../data/connect.dat", "../result/connect", 0.9)
+    # list of datasets
+    testFiles = ["test"]
+    # list of support value 
+    support = [0.5, 0.8] 
+
+    sc = SparkContext(appName="Spark Apriori")
+    spark = SparkSession(sc)
+    schema = StructType([
+        StructField("algorithm", StringType(), False),
+        StructField("datasets", StringType(), False),
+        StructField("support", FloatType(), False),
+    ])
+    for i in range(12):
+        schema.add("test{}".format(i+1), FloatType(), True)
+    experiments = []
+
+    for f in testFiles:
+        for s in support:
+            times = []
+            for i in range(12):
+                start = time.time()
+                apriori(sc, "./data/{}.dat".format(f), "./result/{}{}{}".format(f, s, i+1), s)
+                end = time.time()
+                times.append(end - start)
+            experiments.append(["Apriori", f, s] + times)
+    df = spark.createDataFrame(experiments, schema)
+    df.coalesce(1).write.csv("./experiments/runtime")
+    sc.stop()
