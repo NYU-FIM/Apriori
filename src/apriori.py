@@ -53,9 +53,9 @@ def apriori(sc, f_input, f_output, min_sup):
     # when candidate_k is not empty
     while len(c_k) > 0:
         # generate freq_k
-        Dprint("C{}: {}".format(k, c_k))
+        # Dprint("C{}: {}".format(k, c_k))
         f_k = generate_f_k(sc, c_k, shared_itemset, sup)
-        Dprint("F{}: {}".format(k, f_k))
+        # Dprint("F{}: {}".format(k, f_k))
 
         frequent_itemset.append(f_k)
         # generate candidate_k+1
@@ -69,29 +69,9 @@ def apriori(sc, f_input, f_output, min_sup):
 if __name__ == "__main__":
     # list of datasets
     testFiles = ["test"]
-    # list of support value 
-    support = [0.5, 0.8] 
+    # list of support value
+    support = 0.5
 
     sc = SparkContext(appName="Spark Apriori")
     spark = SparkSession(sc)
-    schema = StructType([
-        StructField("algorithm", StringType(), False),
-        StructField("datasets", StringType(), False),
-        StructField("support", FloatType(), False),
-    ])
-    for i in range(12):
-        schema.add("test{}".format(i+1), FloatType(), True)
-    experiments = []
-
-    for f in testFiles:
-        for s in support:
-            times = []
-            for i in range(12):
-                start = time.time()
-                apriori(sc, "./data/{}.dat".format(f), "./result/{}{}{}".format(f, s, i+1), s)
-                end = time.time()
-                times.append(end - start)
-            experiments.append(["Apriori", f, s] + times)
-    df = spark.createDataFrame(experiments, schema)
-    df.coalesce(1).write.csv("./experiments/runtime")
-    sc.stop()
+    apriori(sc, "./data/{}.data".format(testFiles), "./result/{}{}{}".format(testFiles), support)
