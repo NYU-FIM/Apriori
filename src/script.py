@@ -1,7 +1,4 @@
-from pyspark import SparkContext
-from pyspark.sql import SparkSession
-from pyspark.sql.types import *
-import time
+from apriori import *
 
 if __name__ == "__main__":
     # list of datasets
